@@ -1,0 +1,34 @@
+# Kustomization — собирает все манифесты вместе
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: uber
+
+resources:
+  # Namespace
+  - namespace.yaml
+
+  # Infrastructure - PostgreSQL
+  - infrastructure/postgres/secret.yaml
+  - infrastructure/postgres/configmap.yaml
+  - infrastructure/postgres/pvc.yaml
+  - infrastructure/postgres/deployment.yaml
+  - infrastructure/postgres/service.yaml
+
+  # Infrastructure - Redis
+  - infrastructure/redis/deployment.yaml
+  - infrastructure/redis/service.yaml
+
+  # Infrastructure - Kafka
+  - infrastructure/kafka/zookeeper.yaml
+  - infrastructure/kafka/kafka.yaml
+
+  # Services (раскомментировать позже)
+  # - services/api-gateway/deployment.yaml
+  # - services/api-gateway/service.yaml
+  # - services/user-service/deployment.yaml
+  # - services/user-service/service.yaml
+  # ...
+
+  # Ingress (раскомментировать позже)
+  # - ingress/ingress.yaml

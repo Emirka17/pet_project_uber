@@ -1,0 +1,8 @@
+# Пространство имён для всех ресурсов проекта
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: uber
+  labels:
+    app: uber
+    project: pet-project-uber
