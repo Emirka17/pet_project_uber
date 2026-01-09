@@ -23,6 +23,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-uber}
       POSTGRES_USER: ${POSTGRES_USER:-uber}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-uber_secret_password}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-uber_secret_password}
     ports:
       - "5432:5432"
     volumes:

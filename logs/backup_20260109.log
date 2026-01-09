@@ -1,0 +1,43 @@
+[2026-01-09 22:15:21] =========================================
+[2026-01-09 22:15:21] Starting backup: 20260109_221521
+[2026-01-09 22:15:21] =========================================
+[2026-01-09 22:15:21] Backing up PostgreSQL...
+Creating PostgreSQL backup...
+[2026-01-09 22:15:21] ✗ PostgreSQL backup failed
+[2026-01-09 22:15:21] Backing up Redis...
+Creating Redis backup...
+[2026-01-09 22:15:22] ✗ Redis backup failed
+[2026-01-09 22:15:22] Backing up ClickHouse...
+Creating ClickHouse backup...
+
+The command 'docker' could not be found in this WSL 2 distro.
+We recommend to activate the WSL integration in Docker Desktop settings.
+
+For details about using Docker Desktop with WSL 2, visit:
+
+https://docs.docker.com/go/wsl2/
+
+
+The command 'docker' could not be found in this WSL 2 distro.
+We recommend to activate the WSL integration in Docker Desktop settings.
+
+For details about using Docker Desktop with WSL 2, visit:
+
+https://docs.docker.com/go/wsl2/
+
+[2026-01-09 22:15:22] ✗ ClickHouse backup failed
+[2026-01-09 22:15:22] Cleaning up old backups...
+Cleaning up backups older than 7 days...
+  PostgreSQL: deleted 0 old backup(s)
+  Redis: deleted 0 old backup(s)
+  ClickHouse: deleted 0 old backup(s)
+✓ Old backups cleaned up
+[2026-01-09 22:15:22] ✓ Cleanup completed
+[2026-01-09 22:15:22] Backup sizes:
+[2026-01-09 22:15:22]   PostgreSQL: 0
+[2026-01-09 22:15:22]   Redis: 0
+[2026-01-09 22:15:22]   ClickHouse: 0
+[2026-01-09 22:15:22]   Total: 44K
+[2026-01-09 22:15:22] =========================================
+[2026-01-09 22:15:22] Backup completed with 3 error(s): 20260109_221521
+[2026-01-09 22:15:22] =========================================
