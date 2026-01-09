@@ -5,6 +5,7 @@ from models.user import User, UserCreate, UserUpdate
 from services.user_service import UserService
 from config import settings
 import psycopg2
+from repositories.user_repository import UserRepository
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
