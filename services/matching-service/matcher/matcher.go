@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
-	"time"
 
 	"matching-service/consumer"
 	"matching-service/geo"

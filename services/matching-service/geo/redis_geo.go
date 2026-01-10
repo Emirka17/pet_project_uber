@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -19,29 +18,30 @@ func NewGeoClient(host, port, password string) *GeoClient {
 		Addr:     fmt.Sprintf("%s:%s", host, port),
 		Password: password,
 		DB:       0,
-	})
+ 	})
 
-	return &GeoClient{client: client}
+ 	return &GeoClient{client: client}
 }
 
 func (g *GeoClient) FindNearbyDrivers(ctx context.Context, lat, lon float64, radius float64) ([]string, error) {
-	// Ищем водителей в радиусе radius км
-	// Redis хранит координаты в GEOSET drivers:online
+	// Для go-redis v8 используем GeoRadiusQuery
 	locations, err := g.client.GeoRadius(ctx, "drivers:online", lon, lat, &redis.GeoRadiusQuery{
 		Radius:     radius,
 		Unit:       "km",
 		WithDist:   true,
-		WithCoords: true,
-		Sort:       "ASC", // Сначала ближайшие
+		WithGeoHash: false,
+		WithCoord: true,  // ← Правильное имя
+		Count:      0,
+		Sort:       "ASC",
 	}).Result()
 
 	if err != nil {
-		return nil, err
-	}
+	return nil, err
+ 	}
 
 	var driverIDs []string
 	for _, loc := range locations {
-		driverIDs = append(driverIDs, loc.Name)
+	driverIDs = append(driverIDs, loc.Name)
 	}
 
 	log.Printf("Найдено водителей рядом: %d", len(driverIDs))
