@@ -18,6 +18,7 @@ func main() {
   cfg.UserServiceURL,
   cfg.DriverServiceURL,
   cfg.RideServiceURL,
+  cfg.GeoServiceURL,
  )
 
  // Добавляем логирование

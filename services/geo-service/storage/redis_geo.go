@@ -48,8 +48,8 @@ func (g *GeoStorage) FindNearbyDrivers(ctx context.Context, lat, lon, radius flo
 		distance := loc.Dist / 1000 // meters to km
 		driver := DriverLocation{
 			DriverID: loc.Name,
-			Lat:      loc.GeoPos.Lat,
-			Lon:      loc.GeoPos.Long,
+			Lat:      loc.Latitude,
+			Lon:      loc.Longitude,
 			Distance: distance,
 		}
 		drivers = append(drivers, driver)
