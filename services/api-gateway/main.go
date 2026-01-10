@@ -17,6 +17,7 @@ func main() {
  proxy := handlers.NewProxy(
   cfg.UserServiceURL,
   cfg.DriverServiceURL,
+  cfg.RideServiceURL,
  )
 
  // Добавляем логирование

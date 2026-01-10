@@ -10,6 +10,7 @@ type Config struct {
  Port             string // Порт API Gateway
  UserServiceURL   string // URL User Service
  DriverServiceURL string // URL Driver Service
+ RideServiceURL   string // URL Ride Service
  RedisHost        string // Хост Redis
  RedisPort        string // Порт Redis
  JWTSecret        string // Секрет для JWT
@@ -21,6 +22,7 @@ func LoadConfig() Config {
   Port:             getEnv("API_GATEWAY_PORT", "8080"),
   UserServiceURL:   getEnv("USER_SERVICE_URL", "http://user-service:8001"),
   DriverServiceURL: getEnv("DRIVER_SERVICE_URL", "http://driver-service:8002"),
+  RideServiceURL:   getEnv("RIDE_SERVICE_URL", "http://ride-service:8003"),
   RedisHost:        getEnv("REDIS_HOST", "redis"),
   RedisPort:        getEnv("REDIS_PORT", "6379"),
   JWTSecret:        getEnv("JWT_SECRET", "your-super-secret-jwt-key"),
