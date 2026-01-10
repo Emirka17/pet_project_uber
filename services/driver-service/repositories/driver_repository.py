@@ -4,10 +4,20 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from typing import List, Optional
 from models.driver import Driver, DriverCreate, DriverUpdate
+import redis
+import os
+
 
 class DriverRepository:
     def __init__(self, connection):
         self.conn = connection
+        # Подключение к Redis
+        self.redis_client = redis.Redis(
+            host=os.getenv("REDIS_HOST", "redis"),
+            port=int(os.getenv("REDIS_PORT", 6379)),
+            db=0,
+            decode_responses=True
+        )
     
     def get_driver(self, driver_id: str) -> Optional[Driver]:
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -40,7 +50,7 @@ class DriverRepository:
             rows = cur.fetchall()
             return [Driver(**row) for row in rows]
     
-    def create_driver(self, driver: DriverCreate) -> Driver:
+        def create_driver(self, driver: DriverCreate) -> Driver:
         driver_id = str(uuid.uuid4())
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
@@ -63,9 +73,15 @@ class DriverRepository:
             )
             row = cur.fetchone()
             self.conn.commit()
+            
+            # 🔁 Синхронизация с Redis
+            if driver.is_online and driver.current_latitude and driver.current_longitude:
+                self.add_driver_to_redis(driver_id, driver.current_latitude, driver.current_longitude)
+            
             return Driver(**row)
+
     
-    def update_driver(self, driver_id: str, driver: DriverUpdate) -> Optional[Driver]:
+        def update_driver(self, driver_id: str, driver: DriverUpdate) -> Optional[Driver]:
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 """
@@ -85,8 +101,16 @@ class DriverRepository:
             row = cur.fetchone()
             if row:
                 self.conn.commit()
+                
+                # 🔁 Синхронизация с Redis
+                if driver.is_online and driver.current_latitude and driver.current_longitude:
+                    self.add_driver_to_redis(driver_id, driver.current_latitude, driver.current_longitude)
+                else:
+                    self.remove_driver_from_redis(driver_id)
+                
                 return Driver(**row)
             return None
+
     
     def delete_driver(self, driver_id: str) -> bool:
         with self.conn.cursor() as cur:
@@ -96,3 +120,30 @@ class DriverRepository:
             )
             self.conn.commit()
             return cur.rowcount > 0
+        def add_driver_to_redis(self, driver_id: str, lat: float, lon: float):
+        """Добавить водителя в Redis при is_online = true"""
+        try:
+            # Добавляем в GEOSET
+            self.redis_client.geoadd("drivers:online", [lon, lat, driver_id])
+            
+            # Сохраняем детали
+            self.redis_client.hset(f"driver:location:{driver_id}", mapping={
+                "latitude": str(lat),
+                "longitude": str(lon),
+                "updated_at": "2024-01-15T12:00:00Z"
+            })
+            print(f"✅ Driver {driver_id} added to Redis")
+        except Exception as e:
+            print(f"❌ Redis error (add): {e}")
+
+    def remove_driver_from_redis(self, driver_id: str):
+        """Удалить водителя из Redis при is_online = false"""
+        try:
+            # Удаляем из GEOSET
+            self.redis_client.zrem("drivers:online", driver_id)
+            
+            # Удаляем HASH
+            self.redis_client.delete(f"driver:location:{driver_id}")
+            print(f"✅ Driver {driver_id} removed from Redis")
+        except Exception as e:
+            print(f"❌ Redis error (remove): {e}")
