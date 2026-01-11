@@ -27,7 +27,7 @@ func LoadConfig() Config {
   UserServiceURL:   getEnv("USER_SERVICE_URL", "http://user-service:8001"),
   DriverServiceURL: getEnv("DRIVER_SERVICE_URL", "http://driver-service:8002"),
   RideServiceURL:   getEnv("RIDE_SERVICE_URL", "http://ride-service:8003"),
-  NotificationServiceURL:    getEnv("NOTIFICATION_SERVICE_URL", "http://notification-service:8004"),
+  NotificationServiceURL:    getEnv("NOTIFICATION_SERVICE_URL", "http://notification-service:8008"),
   PaymentServiceURL:    getEnv("PAYMENT_SERVICE_URL", "http://payment-service:8007"),
   PricingServiceURL:    getEnv("PRICING_SERVICE_URL", "http://pricing-service:8006"),
   GeoServiceURL:    getEnv("GEO_SERVICE_URL", "http://geo-service:8005"),

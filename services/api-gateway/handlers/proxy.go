@@ -67,11 +67,12 @@ case strings.HasPrefix(path, "/api/v1/drivers"):
 case strings.HasPrefix(path, "/api/v1/rides"):
  log.Printf("Проксируем в Ride Service: %s", r.URL.Path)
  p.RideService.ServeHTTP(w, r)
-case strings.HasPrefix(path, "/api/v1/notification"):
+case strings.HasPrefix(path, "/api/v1/notifications"):
  log.Printf("Проксируем в Notification Service: %s", r.URL.Path)
  p.NotificationService.ServeHTTP(w, r)
-case strings.HasPrefix(path, "/api/v1/payment"):
- log.Printf("Проксируем в Geo Payment: %s", r.URL.Path)
+case strings.HasPrefix(path, "/api/v1/payments"):
+ log.Printf("Проксируем в Payment Service: %s", r.URL.Path)
+ r.URL.Path = path
  p.PaymentService.ServeHTTP(w, r)
 case strings.HasPrefix(path, "/api/v1/pricing"):
  log.Printf("Проксируем в Pricing Service: %s", r.URL.Path)

@@ -103,7 +103,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 60s
     networks:
       - uber_network
 
@@ -205,6 +205,7 @@ services:
       - GEO_SERVICE_URL=http://geo-service:8005
       - PRICING_SERVICE_URL=http://pricing-service:8006
       - PAYMENT_SERVICE_URL=http://payment-service:8007
+      - NOTIFICATION_SERVIC_URL=http://notification-service:8008
       
     networks:
       - uber_network

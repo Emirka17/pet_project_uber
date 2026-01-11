@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from kafka import KafkaConsumer
+from routers import notifications
 import json
 import threading
 import logging
 
 
 app = FastAPI(title="Notification Service", version="1.0.0")
+
+app.include_router(notifications.router)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
