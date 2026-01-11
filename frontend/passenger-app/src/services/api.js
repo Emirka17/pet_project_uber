@@ -32,10 +32,14 @@ class ApiService {
     };
 
     try {
+      console.log('API Request:', url, config); // Для отладки
       const response = await fetch(url, config);
+      
+      console.log('API Response:', response.status, response.statusText); // Для отладки
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('API Error:', errorData);
         throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
       }
       
@@ -48,6 +52,7 @@ class ApiService {
 
   // User Service методы
   async register(userData) {
+    console.log('Register user:', userData);
     return this.request('/api/v1/users/', {
       method: 'POST',
       body: JSON.stringify(userData),
@@ -55,19 +60,8 @@ class ApiService {
   }
 
   async getCurrentUser(phone) {
-    // Сначала попробуем получить пользователя по phone
-    try {
-      return await this.request(`/api/v1/users/me?phone=${encodeURIComponent(phone)}`);
-    } catch (error) {
-      console.log('User not found by phone, creating new user...');
-      // Если не найден - создаем нового
-      return await this.register({
-        phone: phone,
-        first_name: 'User',
-        last_name: 'Test',
-        email: `${phone.replace('+', '')}@example.com`
-      });
-    }
+    console.log('Get current user by phone:', phone);
+    return this.request(`/api/v1/users/me?phone=${encodeURIComponent(phone)}`);
   }
 
   async getUser(userId) {
@@ -76,6 +70,7 @@ class ApiService {
 
   // Ride Service методы
   async createRide(rideData) {
+    console.log('Create ride:', rideData);
     return this.request('/api/v1/rides/', {
       method: 'POST',
       body: JSON.stringify(rideData),
@@ -83,7 +78,7 @@ class ApiService {
   }
 
   async getRideHistory() {
-    // Пока mock, позже интегрируем с реальным API
+    // Пока mock
     return [
       {
         id: 'ride_123',
@@ -99,6 +94,7 @@ class ApiService {
 
   // Pricing Service методы
   async calculatePrice(pricingData) {
+    console.log('Calculate price:', pricingData);
     return this.request('/api/v1/pricing/calculate', {
       method: 'POST',
       body: JSON.stringify(pricingData),
@@ -107,10 +103,17 @@ class ApiService {
 
   // Payment Service методы
   async processPayment(paymentData) {
+    console.log('Process payment:', paymentData);
     return this.request('/api/v1/payments/process', {
       method: 'POST',
       body: JSON.stringify(paymentData),
     });
+  }
+
+  // Geo Service методы
+  async findNearbyDrivers(lat, lon, radius = 3) {
+    console.log('Find nearby drivers:', lat, lon, radius);
+    return this.request(`/api/v1/geo/drivers/nearby?lat=${lat}&lon=${lon}&radius_km=${radius}`);
   }
 }
 

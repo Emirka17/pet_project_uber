@@ -31,6 +31,7 @@ function Home() {
 }
 
 // Страница регистрации
+// Страница регистрации с реальной интеграцией
 function RegisterPage() {
   const [formData, setFormData] = useState({
     phone: '',
@@ -48,11 +49,16 @@ function RegisterPage() {
     setError('');
     
     try {
-      console.log('Register:', formData);
-      // Здесь будет вызов API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Mock
+      console.log('Register attempt:', formData);
+      
+      // Отправляем данные в User Service
+      const response = await apiService.register(formData);
+      console.log('Registration successful:', response);
+      
+      // Переходим на страницу логина
       navigate('/login');
     } catch (err) {
+      console.error('Registration failed:', err);
       setError(err.message || 'Ошибка регистрации');
     } finally {
       setLoading(false);
@@ -145,6 +151,7 @@ function RegisterPage() {
     </div>
   );
 }
+
 
 // Страница логина
 function LoginPage() {
