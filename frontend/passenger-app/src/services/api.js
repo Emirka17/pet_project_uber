@@ -32,10 +32,10 @@ class ApiService {
     };
 
     try {
-      console.log('API Request:', url, config); // Для отладки
+      console.log('API Request:', url, config);
       const response = await fetch(url, config);
       
-      console.log('API Response:', response.status, response.statusText); // Для отладки
+      console.log('API Response:', response.status, response.statusText);
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
