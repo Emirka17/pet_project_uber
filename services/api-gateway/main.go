@@ -19,6 +19,9 @@ func main() {
   cfg.DriverServiceURL,
   cfg.RideServiceURL,
   cfg.GeoServiceURL,
+  cfg.NotificationServiceURL,
+  cfg.PaymentServiceURL,
+  cfg.PricingServiceURL,
  )
 
  // Добавляем логирование

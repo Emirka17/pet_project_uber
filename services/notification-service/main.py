@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from routers import notifications
-from consumers.kafka_consumer import start_consumer
+from consumer.kafka_consumer import start_consumer
 import uvicorn
 
 app = FastAPI(title="Notification Service", version="1.0.0")

@@ -19,26 +19,36 @@ type Proxy struct {
 	UserService   *httputil.ReverseProxy
 	DriverService *httputil.ReverseProxy
 	RideService   *httputil.ReverseProxy
-	GeoService    *httputil.ReverseProxy  // ← Правильно: GeoService
+	GeoService    *httputil.ReverseProxy
+	PricingService    *httputil.ReverseProxy
+	PaymentService    *httputil.ReverseProxy
+	NotificationService    *httputil.ReverseProxy  
+
 
 }
 
 // NewProxy — создаёт новый прокси
 
-func NewProxy(userURL, driverURL, rideURL, geoURL string) *Proxy {
+func NewProxy(userURL, driverURL, rideURL, geoURL, notificationURL, paymentURL, pricingURL string) *Proxy {
 
 // Парсим URL сервисов
 	userTarget, _ := url.Parse(userURL)
 	driverTarget, _ := url.Parse(driverURL)
 	rideTarget, _ := url.Parse(rideURL)
-	geoTarget, _ := url.Parse(geoURL)  // ← Добавлено
+	geoTarget, _ := url.Parse(geoURL)
+	notificationTarget, _ := url.Parse(notificationURL)
+	paymentTarget, _ := url.Parse(paymentURL)
+	pricingTarget, _ := url.Parse(pricingURL)
 
 	return &Proxy{
 
 	UserService:   httputil.NewSingleHostReverseProxy(userTarget),
 	DriverService: httputil.NewSingleHostReverseProxy(driverTarget),
 	RideService:   httputil.NewSingleHostReverseProxy(rideTarget),
-	GeoService:    httputil.NewSingleHostReverseProxy(geoTarget),  // ← Исправлено
+	GeoService:    httputil.NewSingleHostReverseProxy(geoTarget), 
+	PricingService:   httputil.NewSingleHostReverseProxy(pricingURL),
+	PaymentService:    httputil.NewSingleHostReverseProxy(paymentURL),
+	NotificationService:    httputil.NewSingleHostReverseProxy(notificationURL), 
 
 	}
 
@@ -57,6 +67,15 @@ case strings.HasPrefix(path, "/api/v1/drivers"):
 case strings.HasPrefix(path, "/api/v1/rides"):
  log.Printf("Проксируем в Ride Service: %s", r.URL.Path)
  p.RideService.ServeHTTP(w, r)
+case strings.HasPrefix(path, "/api/v1/notification"):
+ log.Printf("Проксируем в Notification Service: %s", r.URL.Path)
+ p.NotificationService.ServeHTTP(w, r)
+case strings.HasPrefix(path, "/api/v1/payment"):
+ log.Printf("Проксируем в Geo Payment: %s", r.URL.Path)
+ p.PaymentService.ServeHTTP(w, r)
+case strings.HasPrefix(path, "/api/v1/pricing"):
+ log.Printf("Проксируем в Pricing Service: %s", r.URL.Path)
+ p.PricingService.ServeHTTP(w, r)
 case strings.HasPrefix(path, "/api/v1/geo"):
  log.Printf("Проксируем в Geo Service: %s", r.URL.Path)
  p.GeoService.ServeHTTP(w, r)
