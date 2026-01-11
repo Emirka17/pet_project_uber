@@ -7,6 +7,7 @@ import {
   useNavigate // Добавил useNavigate
 } from 'react-router-dom';
 import OrderPage from './pages/OrderPage';
+import apiService from './services/api';
 
 // Главная страница
 function Home() {
