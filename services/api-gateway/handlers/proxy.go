@@ -46,9 +46,9 @@ func NewProxy(userURL, driverURL, rideURL, geoURL, notificationURL, paymentURL, 
 	DriverService: httputil.NewSingleHostReverseProxy(driverTarget),
 	RideService:   httputil.NewSingleHostReverseProxy(rideTarget),
 	GeoService:    httputil.NewSingleHostReverseProxy(geoTarget), 
-	PricingService:   httputil.NewSingleHostReverseProxy(pricingURL),
-	PaymentService:    httputil.NewSingleHostReverseProxy(paymentURL),
-	NotificationService:    httputil.NewSingleHostReverseProxy(notificationURL), 
+	PricingService:   httputil.NewSingleHostReverseProxy(pricingTarget),
+	PaymentService:    httputil.NewSingleHostReverseProxy(paymentTarget),
+	NotificationService:    httputil.NewSingleHostReverseProxy(notificationTarget), 
 
 	}
 
