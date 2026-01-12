@@ -1,7 +1,8 @@
-// frontend/passenger-app/src/pages/OrderPage.js
-import React, { useState } from 'react';
+// Страница заказа поездки с интеграцией Ride Service
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MapComponent from '../components/MapComponent';
+import apiService from '../services/api';
 
 function OrderPage() {
   const navigate = useNavigate();
@@ -20,25 +21,13 @@ function OrderPage() {
   
   const [isLoading, setIsLoading] = useState(false);
   const [activeInput, setActiveInput] = useState('pickup');
+  const [priceInfo, setPriceInfo] = useState(null);
+  const [nearbyDrivers, setNearbyDrivers] = useState([]);
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      console.log('Заказ:', { pickupLocation, dropoffLocation });
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      navigate('/tracking');
-    } catch (error) {
-      console.error('Ошибка:', error);
-      alert('Произошла ошибка');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Обработка клика по карте
   const handleMapClick = (latlng) => {
-    console.log('OrderPage - Map clicked:', latlng); // Для отладки
+    console.log('Map clicked:', latlng);
     
     if (activeInput === 'pickup') {
       setPickupLocation({
@@ -46,22 +35,129 @@ function OrderPage() {
         lat: latlng.lat,
         lng: latlng.lng
       });
-      console.log('Set pickup location:', latlng);
     } else {
       setDropoffLocation({
         address: `Координаты: ${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`,
         lat: latlng.lat,
         lng: latlng.lng
       });
-      console.log('Set dropoff location:', latlng);
     }
   };
+
+  // Расчет стоимости поездки
+  const calculatePrice = async () => {
+    if (!pickupLocation.lat || !dropoffLocation.lat) return;
+    
+    try {
+      const pricingData = {
+        pickup_latitude: pickupLocation.lat,
+        pickup_longitude: pickupLocation.lng,
+        dropoff_latitude: dropoffLocation.lat,
+        dropoff_longitude: dropoffLocation.lng,
+        passenger_count: 1,
+        pickup_datetime: new Date().toISOString()
+      };
+      
+      console.log('Calculating price:', pricingData);
+      const priceResult = await apiService.calculatePrice(pricingData);
+      setPriceInfo(priceResult);
+      console.log('Price calculated:', priceResult);
+    } catch (error) {
+      console.error('Price calculation failed:', error);
+      setError('Не удалось рассчитать стоимость поездки');
+    }
+  };
+
+  // Поиск ближайших водителей
+  const findNearbyDrivers = async () => {
+    try {
+      console.log('Finding nearby drivers:', pickupLocation.lat, pickupLocation.lng);
+      const drivers = await apiService.findNearbyDrivers(
+        pickupLocation.lat, 
+        pickupLocation.lng, 
+        3 // радиус 3 км
+      );
+      setNearbyDrivers(drivers);
+      console.log('Nearby drivers found:', drivers);
+    } catch (error) {
+      console.error('Driver search failed:', error);
+      // Не показываем ошибку, так как это не критично
+    }
+  };
+
+  // Создание поездки
+  const createRide = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      // Генерируем mock user_id (в реальном приложении будет из контекста)
+      const userId = 'user_' + Date.now();
+      
+      const rideData = {
+        user_id: userId,
+        vendor_id: 1,
+        pickup_datetime: new Date().toISOString(),
+        dropoff_datetime: new Date(Date.now() + 20 * 60000).toISOString(), // +20 минут
+        passenger_count: 1,
+        pickup_latitude: pickupLocation.lat,
+        pickup_longitude: pickupLocation.lng,
+        dropoff_latitude: dropoffLocation.lat,
+        dropoff_longitude: dropoffLocation.lng,
+        trip_duration: 1200, // 20 минут в секундах
+        pickup_district: 'Manhattan',
+        pickup_neighbourhood: 'Midtown',
+        dropoff_district: 'Brooklyn',
+        dropoff_neighbourhood: 'Williamsburg',
+        pickup_hour: new Date().getHours(),
+        day_name: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()],
+        weekday_or_weekend: new Date().getDay() >= 1 && new Date().getDay() <= 5 ? 'weekday' : 'weekend',
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        season: 'Winter'
+      };
+      
+      console.log('Creating ride:', rideData);
+      const rideResult = await apiService.createRide(rideData);
+      console.log('Ride created:', rideResult);
+      
+      // Переход к отслеживанию поездки
+      navigate('/tracking');
+      
+    } catch (error) {
+      console.error('Ride creation failed:', error);
+      setError(error.message || 'Не удалось создать поездку');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Обработка отправки формы
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await createRide();
+  };
+
+  // Автоматический расчет цены и поиск водителей при изменении координат
+  useEffect(() => {
+    if (pickupLocation.lat && dropoffLocation.lat) {
+      calculatePrice();
+      findNearbyDrivers();
+    }
+  }, [pickupLocation.lat, dropoffLocation.lat]);
 
   return (
     <div className="max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-800 mb-8">🚖 Заказ поездки</h1>
       
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Форма заказа */}
         <div className="card">
           <h2 className="text-xl font-semibold mb-4">Информация о поездке</h2>
           
@@ -96,6 +192,7 @@ function OrderPage() {
               />
             </div>
             
+            {/* Информация о маршруте */}
             <div className="bg-blue-50 p-3 rounded-md">
               <div className="text-sm text-blue-800">
                 <div>📍 Отправление: {pickupLocation.lat.toFixed(6)}, {pickupLocation.lng.toFixed(6)}</div>
@@ -103,10 +200,36 @@ function OrderPage() {
               </div>
             </div>
             
+            {/* Расчет стоимости */}
+            {priceInfo && (
+              <div className="bg-green-50 p-3 rounded-md">
+                <h3 className="font-semibold text-green-800 mb-2">💰 Стоимость поездки</h3>
+                <div className="text-sm text-green-700 space-y-1">
+                  <div>Базовый тариф: ${priceInfo.base_fare}</div>
+                  <div>За расстояние: ${priceInfo.distance_fare}</div>
+                  <div>За время: ${priceInfo.time_fare}</div>
+                  {priceInfo.surge_multiplier > 1 && (
+                    <div>Пиковая нагрузка: x{priceInfo.surge_multiplier}</div>
+                  )}
+                  <div className="font-bold text-lg">Итого: ${priceInfo.total_amount} {priceInfo.currency}</div>
+                </div>
+              </div>
+            )}
+            
+            {/* Ближайшие водители */}
+            {nearbyDrivers.length > 0 && (
+              <div className="bg-yellow-50 p-3 rounded-md">
+                <h3 className="font-semibold text-yellow-800 mb-2">🚕 Доступные водители</h3>
+                <div className="text-sm text-yellow-700">
+                  Найдено водителей поблизости: {nearbyDrivers.length}
+                </div>
+              </div>
+            )}
+            
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !priceInfo}
                 className="w-full button-primary flex items-center justify-center"
               >
                 {isLoading ? (
@@ -118,13 +241,14 @@ function OrderPage() {
                     Создание заказа...
                   </>
                 ) : (
-                  'Заказать поездку'
+                  priceInfo ? `Заказать поездку за $${priceInfo.total_amount}` : 'Рассчитываем стоимость...'
                 )}
               </button>
             </div>
           </form>
         </div>
         
+        {/* Карта */}
         <div className="card">
           <h2 className="text-xl font-semibold mb-4">Карта маршрута</h2>
           <div className="mb-2 text-sm text-gray-600">

@@ -1,3 +1,22 @@
+// Добавь в импорты в начало App.js
+import ProfilePage from './pages/ProfilePage';
+import TrackingPage from './pages/TrackingPage';
+import HistoryPage from './pages/HistoryPage';
+
+// Добавь маршруты в Routes
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/order" element={<OrderPage />} />
+  <Route path="/register" element={<RegisterPage />} />
+  <Route path="/login" element={<LoginPage />} />
+  <Route path="/history" element={<HistoryPage />} />
+  <Route path="/profile" element={<ProfilePage />} />
+  <Route path="/tracking" element={<TrackingPage />} />
+  <Route path="/payment" element={<PaymentPage />} />
+  <Route path="*" element={<NotFound />} />
+</Routes>
+
+
 import React, { useState } from 'react'; // Добавил useState
 import {
   BrowserRouter as Router,
