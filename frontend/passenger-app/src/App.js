@@ -48,12 +48,23 @@ function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+// ddd@example.com
     try {
       console.log('Register attempt:', formData);
+
+      const fullName = (formData.first_name + ' ' +formData.last_name).trim(); // Объединяем имя и фамилию
+      
+      // Преобразуем данные для User Service
+      const userData = {
+        phone: formData.phone,
+        name: fullName,
+        email: formData.email
+      };
+
+      console.log('Sending user data:', userData)
       
       // Отправляем данные в User Service
-      const response = await apiService.register(formData);
+      const response = await apiService.register(userData);
       console.log('Registration successful:', response);
       
       // Переходим на страницу логина
@@ -65,7 +76,6 @@ function RegisterPage() {
       setLoading(false);
     }
   };
-
   return (
     <div className="max-w-md mx-auto card">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">הרשמה</h2>
